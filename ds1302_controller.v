@@ -13,7 +13,7 @@ module ds1302_controller(
     output [7:0] out_month,
     output [7:0] out_year
 );
-    // 100MHz -> 1MHz 분주
+    // 100MHz -> 1MHz 분주 (DS1302 통신용 저속 클럭)
     reg [6:0] clk_div;
     always @(posedge clk) clk_div <= clk_div + 1;
     wire clk_1mhz = (clk_div == 0);
@@ -21,11 +21,16 @@ module ds1302_controller(
     reg [7:0] state = 0;
     reg [6:0] bit_cnt = 0;
     reg [63:0] read_buffer;
-    
-    // Read Burst Command (0xBF)
-    wire [7:0] read_cmd = 8'hBF;
 
-    reg io_dir = 0; // 읽기 모드이므로 기본 High-Z(입력)
+    // 명령어 변수화 (상수 인덱싱 오류 방지)
+    wire [7:0] write_cmd = 8'hBE; // Burst Write
+    wire [7:0] read_cmd  = 8'hBF; // Burst Read
+
+    // [설정 1] 시간 수정 시 아래 값을 BCD 형식으로 변경하세요.
+    // WP(00)_Year_DayOfWeek_Month_Day_Hour_Min_Sec
+    wire [63:0] init_data = 64'h00_26_00_03_06_17_00_00; 
+
+    reg io_dir = 1; // 1: Output, 0: Input
     reg io_out = 0;
     assign ds1302_io = (io_dir) ? io_out : 1'bz;
 
@@ -37,55 +42,58 @@ module ds1302_controller(
                 0: begin 
                     ds1302_ce <= 1; 
                     bit_cnt <= 0;
-                    state <= 1; 
+                    
+                    // [설정 2] 모드 선택
+                    state <= 4; // 평상시: 4 (Read 모드, 배터리 시간 유지)
+                     //state <= 1; // 시간 수정 시: 1 (Write 모드)
                 end
 
-                // --- Burst Read 시작 ---
-                1: begin // 명령 전송 (0xBF)
+                // --- Burst Write (시간 설정) ---
+                1: begin 
                     if(bit_cnt < 8) begin
-                        io_dir <= 1; // 명령 보낼 때는 출력 모드
-                        io_out <= read_cmd[bit_cnt[2:0]];
+                        io_dir <= 1;
+                        io_out <= write_cmd[bit_cnt[2:0]]; // 수정됨: 변수 인덱싱
                         ds1302_sclk <= 0; 
                         state <= 2;
+                    end else begin bit_cnt <= 0; state <= 3; end
+                end
+                2: begin ds1302_sclk <= 1; bit_cnt <= bit_cnt + 1; state <= 1; end
+                3: begin 
+                    if(bit_cnt < 64) begin
+                        io_out <= init_data[bit_cnt]; ds1302_sclk <= 0; state <= 10;
                     end else begin 
-                        bit_cnt <= 0; 
-                        io_dir <= 0; // 명령 전송 후 입력 모드로 전환
-                        state <= 3; 
+                        ds1302_ce <= 0; state <= 0; 
                     end
                 end
-                
-                2: begin 
-                    ds1302_sclk <= 1; 
-                    bit_cnt <= bit_cnt + 1; 
-                    state <= 1; 
-                end
+                10: begin ds1302_sclk <= 1; bit_cnt <= bit_cnt + 1; state <= 3; end
 
-                3: begin // 64비트 데이터 읽기 루프
+                // --- Burst Read (시간 읽기) ---
+                4: begin 
+                    if(bit_cnt < 8) begin
+                        io_dir <= 1;
+                        io_out <= read_cmd[bit_cnt[2:0]]; // 수정됨: 변수 인덱싱
+                        ds1302_sclk <= 0; 
+                        state <= 5;
+                    end else begin bit_cnt <= 0; io_dir <= 0; state <= 6; end
+                end
+                5: begin ds1302_sclk <= 1; bit_cnt <= bit_cnt + 1; state <= 4; end
+                6: begin 
                     if(bit_cnt < 64) begin
                         ds1302_sclk <= 0; 
-                        state <= 4;
-                    end else begin 
-                        state <= 5; 
-                    end
+                        state <= 7;
+                    end else begin state <= 8; end
                 end
-                
-                4: begin
-                    read_buffer[bit_cnt] <= ds1302_io; // 데이터 샘플링
+                7: begin
+                    read_buffer[bit_cnt] <= ds1302_io;
                     ds1302_sclk <= 1; 
                     bit_cnt <= bit_cnt + 1; 
-                    state <= 3;
+                    state <= 6;
                 end
-
-                5: begin 
-                    ds1302_ce <= 0; 
-                    ds1302_sclk <= 0; 
-                    state <= 0; // 무한 반복 (1초 주기는 top의 tick_gen이 관리)
-                end
+                8: begin ds1302_ce <= 0; ds1302_sclk <= 0; state <= 0; end
             endcase
         end
     end
-
-    // 결과 출력 (BCD)
+// 무슨요일인지 나타내는 [47:40] 은 미구현
     assign out_sec   = read_buffer[7:0];
     assign out_min   = read_buffer[15:8];
     assign out_hour  = read_buffer[23:16];
