@@ -75,7 +75,5 @@
    - PC에서 터미널 프로그램(Tera Term, PuTTY 등)을 열고 115200 Baud rate로 접속하여 데이터 로그 확인.
 
 ---
+application/miri-canvas-node
 
-## 👨‍💻 작성자 및 라이선스
-- **Author:** [Your Name/ID]
-- **License:** MIT License
