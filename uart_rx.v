@@ -1,6 +1,4 @@
 `timescale 1ns / 1ps
-
-
 module uart_rx #(parameter BPS=9600)
 (
     input clk,
