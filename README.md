@@ -80,5 +80,5 @@
 1. **온/습도 측정:** 습도정수부, 습도소수부, 온도정수부, 온도소수부, 패리티 비트 순으로 검출
 2. **습도 계산:** 0000 0111= 0x07이므로, 7%
 3. **온도 계산:** 0001 1010= 0x1A이므로, 26°
-![Image](https://github.com/user-attachments/assets/eb1d8bce-fcfd-4542-a8fd-79b0e640569a)
+![Image](https://github.com/user-attachments/assets/daff0739-3c7d-4816-8406-16e2c9216af3)
  **동작 결과 분석:** -start signal 검출, 최소 18ms의 풀다운 신호, 20~40us의 풀업신호
