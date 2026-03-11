@@ -85,4 +85,4 @@
 ---
 
 ## 시연 영상
-[![Video Label](https://youtu.be/lDORwLWcnpI)
+[![프로젝트 시연 영상](http://img.youtube.com/vi/lDORwLWcnpI /0.jpg)](https://www.youtube.com/watch?v=lDORwLWcnpI )
