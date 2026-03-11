@@ -82,3 +82,7 @@
 3. **온도 계산:** 0001 1010= 0x1A이므로, 26°
 ![Image](https://github.com/user-attachments/assets/daff0739-3c7d-4816-8406-16e2c9216af3)
  **동작 결과 분석:** -start signal 검출, 최소 18ms의 풀다운 신호, 20~40us의 풀업신호
+---
+
+## 시연 영상
+[![Video Label](https://youtu.be/lDORwLWcnpI)
