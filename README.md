@@ -84,5 +84,5 @@
  **동작 결과 분석:** -start signal 검출, 최소 18ms의 풀다운 신호, 20~40us의 풀업신호
 ---
 
-## 시연 영상
-[![프로젝트 시연 영상](http://img.youtube.com/vi/lDORwLWcnpI /0.jpg)](https://www.youtube.com/watch?v=lDORwLWcnpI )
+### 📺 프로젝트 시연 영상
+* [FPGA 스마트 홈 시스템 시연 영상 바로가기](https://www.youtube.com/watch?v=lDORwLWcnpI)
