@@ -1,6 +1,6 @@
-# 🏠 FPGA Smart Home & Environment Monitoring System
+# 🏠 Air-Handling-Unit System
 
-> **Verilog HDL** 기반의 실시간 환경 감시 및 스마트 홈 제어 시스템입니다. 
+> **Verilog** 기반의 공조기 구현 시스템입니다. 
 > FPGA(Basys3)를 중앙 제어 장치로 활용하여 시간, 온도, 습도를 정밀하게 측정하고, 분석된 데이터를 바탕으로 모터와 부저 등 하드웨어를 능동적으로 제어합니다.
 
 ---
